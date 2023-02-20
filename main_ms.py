@@ -18,7 +18,7 @@ class MSNetPL(pl.LightningModule):
         self.batch_size = args.batch_size
         self.num_threads = args.num_threads
         self.num_gpus = args.num_gpus
-        self.batch_size=args.batch_size
+        self.batch_size = args.batch_size
         self.lr = args.lr
         self.args = args
 
@@ -26,20 +26,13 @@ class MSNetPL(pl.LightningModule):
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
 
-        self.dali_dataset = DALIDataset(data_dir=args.data_dir,
-                                        batch_size=args.batch_size*args.num_gpus,
-                                        num_threads=args.num_threads)
-
-
     def forward(self, x):
         z1, z2, z3, y1, y2, y3 = self.encoder(x)
         return z1, z2, z3, y1, y2, y3
 
-
     def share_step(self, batch, batch_idx):
         x, target = batch
         z1, z2, z3, y1, y2, y3 = self.forward(x)
-
 
         si_loss1 = self.mse_loss(z1, z2)
         si_loss2 = self.mse_loss(z1, z3)
@@ -95,13 +88,13 @@ class MSNetPL(pl.LightningModule):
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
 
-    def train_dataloader(self):
-        self.dali_dataset.setup('train')
-        return self.dali_dataset.train_dataloader()
 
-    def val_dataloader(self):
-        self.dali_dataset.setup('val')
-        return self.dali_dataset.val_dataloader()
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
@@ -119,4 +112,6 @@ if __name__ == '__main__':
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
-    trainer.fit(model)
+    dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
+                                  num_threads=args.num_threads)
+    trainer.fit(model, datamodule=dali_datamodule)
