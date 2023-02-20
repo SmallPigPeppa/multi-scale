@@ -10,7 +10,7 @@ import torch.nn.functional as F
 class BaselineNet(nn.Module):
     def __init__(self):
         super(BaselineNet, self).__init__()
-        self.resnet=resnet50(pretrained=True)
+        self.resnet=resnet50(pretrained=False)
         self.small_size = (32, 32)
         self.mid_size = (128, 128)
         self.large_size = (224, 224)
