@@ -111,6 +111,7 @@ if __name__ == '__main__':
                          check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
                          strategy='ddp',
+                         precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
@@ -120,7 +121,6 @@ if __name__ == '__main__':
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=2,
-        precision=16,
         batch_size=args.batch_size)
 
     trainer.fit(model, datamodule=dali_datamodule)
