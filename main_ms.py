@@ -25,10 +25,7 @@ class MSNetPL(pl.LightningModule):
         self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
-        self.dali_dataset = DALIDataset(data_dir=args.data_dir,
-                                        batch_size=args.batch_size * self.num_gpus,
-                                        num_threads=args.num_threads,
-                                        num_gpus=args.num_gpus)
+
 
     def forward(self, x):
         z1, z2, z3, y1, y2, y3 = self.encoder(x)
