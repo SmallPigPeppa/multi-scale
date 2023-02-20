@@ -6,4 +6,4 @@ DATA_PATH=/mnt/mmtech01/dataset/lzy/ILSVRC2012
     --num_workers 16 \
     --ckpt_dir supervised-l1-ckpt\
     --name supervised-l1 \
-    -offline
+    --offline
