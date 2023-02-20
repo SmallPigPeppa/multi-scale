@@ -12,7 +12,7 @@ from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
 
 
-class MSNetPL(pl.LightningModule):
+class BaselineNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.num_gpus = args.num_gpus
@@ -24,20 +24,16 @@ class MSNetPL(pl.LightningModule):
         self.mse_loss = nn.MSELoss()
 
     def forward(self, x):
-        z1, z2, z3, y1, y2, y3 = self.encoder(x)
-        return z1, z2, z3, y1, y2, y3
+        y1, y2, y3 = self.encoder(x)
+        return y1, y2, y3
 
     def share_step(self, batch, batch_idx):
         x, target = batch
-        z1, z2, z3, y1, y2, y3 = self.forward(x)
-
-        si_loss1 = self.mse_loss(z1, z2)
-        si_loss2 = self.mse_loss(z1, z3)
-        si_loss3 = self.mse_loss(z2, z3)
+        y1, y2, y3 = self.forward(x)
         ce_loss1 = self.ce_loss(y1, target)
         ce_loss2 = self.ce_loss(y2, target)
         ce_loss3 = self.ce_loss(y3, target)
-        total_loss = si_loss1 + si_loss2 + si_loss3 + ce_loss1 + ce_loss2 + ce_loss3
+        total_loss = ce_loss1 + ce_loss2 + ce_loss3
 
         acc1 = (torch.argmax(y1, dim=1) == target).float().mean()
         acc2 = (torch.argmax(y2, dim=1) == target).float().mean()
@@ -45,9 +41,6 @@ class MSNetPL(pl.LightningModule):
         avg_acc = (acc1 + acc2 + acc3) / 3
 
         result_dict = {
-            "si_loss1": si_loss1,
-            "si_loss2": si_loss2,
-            "si_loss3": si_loss3,
             "ce_loss1": ce_loss1,
             "ce_loss2": ce_loss2,
             "ce_loss3": ce_loss3,
@@ -98,7 +91,7 @@ class MSNetPL(pl.LightningModule):
 
 if __name__ == '__main__':
     args = parse_args()
-    model = MSNetPL(args)
+    model = BaselineNetPL(args)
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
@@ -120,4 +113,5 @@ if __name__ == '__main__':
         num_workers=args.num_workers,
         batch_size=args.batch_size)
 
-    trainer.fit(model, datamodule=dali_datamodule)
+    # trainer.validate(model, datamodule=dali_datamodule)
+    trainer.test(model, dataloader=dali_datamodule.val_dataloader())
