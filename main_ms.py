@@ -31,7 +31,6 @@ class MSNetPL(pl.LightningModule):
         return z1, z2, z3, y1, y2, y3
 
     def share_step(self, batch, batch_idx):
-        print(batch)
         x, target = batch['data'],batch['label']
         z1, z2, z3, y1, y2, y3 = self.forward(x)
 
