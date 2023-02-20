@@ -117,7 +117,6 @@ if __name__ == '__main__':
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
-                         gradient_clip_val=0.5,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
                          logger=wandb_logger,
