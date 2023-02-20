@@ -9,6 +9,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from data_modules.imagenet_dali import DALIDataset
 from models.msnet_l1 import MultiScaleNet
 from data_modules.ali import ClassificationDALIDataModule
+from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
 
 
@@ -23,6 +24,8 @@ class MSNetPL(pl.LightningModule):
         self.batch_size = args.batch_size
         self.lr = args.lr
         self.args = args
+
+
 
         self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
@@ -83,8 +86,10 @@ class MSNetPL(pl.LightningModule):
         #     return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
+        scale_factor = self.batch_size * self.num_gpus  / 256
+        lr = self.lr * scale_factor
         optimizer = optim.SGD(self.parameters(),
-                              lr=self.lr * self.num_gpus,
+                              lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
@@ -110,7 +115,7 @@ if __name__ == '__main__':
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
-                         strategy='ddp',
+                         strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
