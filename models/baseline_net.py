@@ -14,7 +14,6 @@ class BaselineNet(nn.Module):
         self.small_size = (32, 32)
         self.mid_size = (128, 128)
         self.large_size = (224, 224)
-        self.unified_size = (56, 56)
 
 
     def forward(self, imgs):

@@ -37,6 +37,16 @@ class MSNetPL(pl.LightningModule):
         ce_loss1 = self.ce_loss(y1, target)
         ce_loss2 = self.ce_loss(y2, target)
         ce_loss3 = self.ce_loss(y3, target)
+
+        if si_loss1 < 0.01:
+            si_loss1 = 0
+
+        if si_loss2 < 0.01:
+            si_loss2 = 0
+
+        if si_loss3 < 0.01:
+            si_loss3 = 0
+
         total_loss = si_loss1 + si_loss2 + si_loss3 + ce_loss1 + ce_loss2 + ce_loss3
 
         acc1 = (torch.argmax(y1, dim=1) == target).float().mean()
