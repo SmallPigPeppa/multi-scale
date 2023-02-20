@@ -47,7 +47,7 @@ class MSNetPL(pl.LightningModule):
         acc1 = (torch.argmax(y1, dim=1) == target).float().mean()
         acc2 = (torch.argmax(y2, dim=1) == target).float().mean()
         acc3 = (torch.argmax(y3, dim=1) == target).float().mean()
-        avg_acc = torch.mean([acc1, acc2, acc3])
+        avg_acc = (acc1 + acc2 + acc3) / 3
 
         result_dict = {
             "si_loss1": si_loss1,
