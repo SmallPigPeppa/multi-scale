@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 
 def unified_net():
-    u_net = resnet50(pretrained=True)
+    u_net = resnet50(pretrained=False)
     u_net.conv1 = nn.Identity()
     u_net.bn1 = nn.Identity()
     u_net.relu = nn.Identity()
