@@ -97,6 +97,7 @@ class MSNetPL(pl.LightningModule):
 
 
 if __name__ == '__main__':
+    pl.seed_everything(5)
     args = parse_args()
     model = MSNetPL(args)
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
