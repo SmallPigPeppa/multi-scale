@@ -52,6 +52,33 @@ class HybridValPipe(Pipeline):
         output = self.cmnp(images)
         return [output, labels]
 
+class DALIDataset(pl.LightningDataModule):
+    def __init__(self, data_dir, batch_size, num_threads, device_id):
+        super().__init__()
+        self.data_dir = data_dir
+        self.batch_size = batch_size
+        self.num_threads = num_threads
+        self.device_id = device_id
+
+    def setup(self, stage):
+        self.train_pipe = HybridTrainPipe(batch_size=self.batch_size,
+                                           num_threads=self.num_threads,
+                                           device_id=self.device_id,
+                                           data_dir=self.data_dir)
+        self.val_pipe = HybridValPipe(batch_size=self.batch_size,
+                                       num_threads=self.num_threads,
+                                       device_id=self.device_id,
+                                       data_dir=self.data_dir)
+        self.train_pipe.build()
+        self.val_pipe.build()
+
+    def train_dataloader(self):
+        return DALIGenericIterator(self.train_pipe, ['data', 'label'],
+                               self.batch_size, fill_last_batch=False)
+
+    def val_dataloader(self):
+        return DALIGenericIterator(self.val_pipe, ['data', 'label'],
+                                   self.batch_size, fill_last_batch=False)
 
 # class DALIDataset(pl.LightningDataModule):
 #     def __init__(self, data_dir, batch_size, num_threads, num_gpus):
