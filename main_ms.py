@@ -16,17 +16,10 @@ from args import parse_args
 class MSNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
-        self.num_classes = args.num_classes
-        self.data_dir = args.data_dir
-        self.batch_size = args.batch_size
-        self.num_threads = args.num_threads
         self.num_gpus = args.num_gpus
         self.batch_size = args.batch_size
         self.lr = args.lr
         self.args = args
-
-
-
         self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
@@ -124,8 +117,8 @@ if __name__ == '__main__':
     #                               num_threads=args.num_threads)
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
-        val_data_path=os.path.join(args.data_dir,'val'),
-        num_workers=2,
+        val_data_path=os.path.join(args.data_xdir,'val'),
+        num_workers=args.num_workers,
         batch_size=args.batch_size)
 
     trainer.fit(model, datamodule=dali_datamodule)
