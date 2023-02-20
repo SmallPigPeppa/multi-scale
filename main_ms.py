@@ -31,9 +31,9 @@ class MSNetPL(pl.LightningModule):
 
     def forward(self, x):
         z1, z2, z3, y1, y2, y3 = self.encoder(x)
-        y1=self.fc(y1)
-        y2=self.fc(y2)
-        y3=self.fc(y3)
+        # y1=self.fc(y1)
+        # y2=self.fc(y2)
+        # y3=self.fc(y3)
         return z1, z2, z3, y1, y2, y3
 
 
