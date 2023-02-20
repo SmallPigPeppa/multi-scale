@@ -114,7 +114,7 @@ if __name__ == '__main__':
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
-                         distributed_backend='ddp',
+                         strategy='ddp',
                          enable_checkpointing=False,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
