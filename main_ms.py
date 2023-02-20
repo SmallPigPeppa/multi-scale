@@ -27,13 +27,10 @@ class MSNetPL(pl.LightningModule):
                                         batch_size=args.batch_size * self.num_gpus,
                                         num_threads=args.num_threads,
                                         num_gpus=args.num_gpus)
-        self.fc = nn.Linear(in_features=2048, out_features=args.num_classes)
+        self.dali_dataset.setup()
 
     def forward(self, x):
         z1, z2, z3, y1, y2, y3 = self.encoder(x)
-        # y1=self.fc(y1)
-        # y2=self.fc(y2)
-        # y3=self.fc(y3)
         return z1, z2, z3, y1, y2, y3
 
 
