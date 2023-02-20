@@ -119,7 +119,7 @@ if __name__ == '__main__':
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
-        num_workers=4,
-        batch_size=args.batch_size * args.num_gpus)
+        num_workers=2,
+        batch_size=args.batch_size)
 
     trainer.fit(model, datamodule=dali_datamodule)
