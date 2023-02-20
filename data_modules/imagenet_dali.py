@@ -53,12 +53,11 @@ class HybridValPipe(Pipeline):
         return [output, labels]
 
 class DALIDataset(pl.LightningDataModule):
-    def __init__(self, data_dir, batch_size, num_threads, device_id):
+    def __init__(self, data_dir, batch_size, num_threads):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.num_threads = num_threads
-        self.device_id = device_id
 
     def setup(self, stage):
         self.device_id = self.trainer.local_rank

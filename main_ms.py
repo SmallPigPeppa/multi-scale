@@ -5,7 +5,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
-from data_modules.imagenet_dali import HybridValPipe,HybridTrainPipe
+from data_modules.imagenet_dali import DALIDataset
 from models.msnet_l1 import MultiScaleNet
 from args import parse_args
 
@@ -26,6 +26,10 @@ class MSNetPL(pl.LightningModule):
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
 
+        self.dali_dataset = DALIDataset(data_dir=args.data_dir,
+                                        batch_size=args.batch_size*args.num_gpus,
+                                        num_threads=args.num_threads)
+
 
     def forward(self, x):
         z1, z2, z3, y1, y2, y3 = self.encoder(x)
@@ -33,7 +37,7 @@ class MSNetPL(pl.LightningModule):
 
 
     def share_step(self, batch, batch_idx):
-        [x, target] = batch
+        x, target = batch
         z1, z2, z3, y1, y2, y3 = self.forward(x)
 
 
@@ -92,19 +96,12 @@ class MSNetPL(pl.LightningModule):
         return [optimizer], [scheduler]
 
     def train_dataloader(self):
-        dali_train_loader = HybridTrainPipe(data_dir=self.data_dir,batch_size=self.batch_size * self.num_gpus,
-                                                     num_threads=self.num_threads,
-                                                     device_id=self.local_rank)
-        dali_train_loader.build()
-        return iter(dali_train_loader.run())
+        self.dali_dataset.setup('train')
+        return self.dali_dataset.train_dataloader()
 
     def val_dataloader(self):
-
-        dali_val_loader = HybridValPipe(data_dir=self.data_dir,batch_size=self.batch_size * self.num_gpus,
-                                                 num_threads=self.num_threads,
-                                                 device_id=self.local_rank)
-        dali_val_loader.build()
-        return iter(dali_val_loader.run())
+        self.dali_dataset.setup('val')
+        return self.dali_dataset.val_dataloader()
 
 
 if __name__ == '__main__':
