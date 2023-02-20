@@ -25,7 +25,7 @@ class HybridTrainPipe(Pipeline):
         images = self.decode(jpegs)
         images = self.res(images)
         output = self.cmnp(images, mirror=self.coin())
-        return [output, labels]
+        return output, labels
 
 
 class HybridValPipe(Pipeline):
@@ -48,7 +48,7 @@ class HybridValPipe(Pipeline):
         images = self.decode(jpegs)
         images = self.resize(images)
         output = self.cmnp(images)
-        return [output, labels]
+        return output, labels
 
 
 class DALIDataset(pl.LightningDataModule):
