@@ -115,7 +115,6 @@ if __name__ == '__main__':
                          check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
                          strategy='ddp',
-                         enable_checkpointing=False,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
