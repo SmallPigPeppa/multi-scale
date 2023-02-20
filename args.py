@@ -12,6 +12,7 @@ def parse_args():
     parser.add_argument("--weight_decay", type=float, default=0.0001)
     parser.add_argument("--num_classes", type=int, default=1000)
     parser.add_argument("--num_gpus", type=int, default=2)
+    parser.add_argument("--num_threads", type=int, default=16)
     parser.add_argument("--max_epochs", type=int, default=90)
 
     # wandb
