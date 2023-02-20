@@ -95,14 +95,16 @@ class MSNetPL(pl.LightningModule):
         dali_train_loader = HybridTrainPipe(data_dir=self.data_dir,batch_size=self.batch_size * self.num_gpus,
                                                      num_threads=self.num_threads,
                                                      device_id=self.local_rank)
-        return dali_train_loader
+        dali_train_loader.build()
+        return iter(dali_train_loader)
 
     def val_dataloader(self):
 
         dali_val_loader = HybridValPipe(data_dir=self.data_dir,batch_size=self.batch_size * self.num_gpus,
                                                  num_threads=self.num_threads,
                                                  device_id=self.local_rank)
-        return dali_val_loader
+        dali_val_loader.build()
+        return iter(dali_val_loader)
 
 
 if __name__ == '__main__':
