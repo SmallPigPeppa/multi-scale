@@ -1,5 +1,3 @@
-from data_modules.imagenet_dali import DALIDataset
-from models.multi_resnet_l1_v2 import MultiScaleNet
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -7,10 +5,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
+from data_modules.imagenet_dali import DALIDataset
+from models.msnet_l1 import MultiScaleNet
 from args import parse_args
 
 
-class MSPL(pl.LightningModule):
+class MSNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.num_classes = args.num_classes
@@ -18,6 +18,7 @@ class MSPL(pl.LightningModule):
         self.batch_size = args.batch_size
         self.num_threads = args.num_threads
         self.num_gpus = args.num_gpus
+        self.lr = args.lr
         self.args = args
         self.model = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
@@ -82,7 +83,7 @@ class MSPL(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = optim.SGD(self.parameters(),
-                              lr=0.1 * self.num_gpus,
+                              lr=self.lr * self.num_gpus,
                               momentum=0.9,
                               weight_decay=1e-4)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
@@ -97,16 +98,13 @@ class MSPL(pl.LightningModule):
 
 if __name__ == '__main__':
     args = parse_args()
-
-    model = MSPL(args)
-
+    model = MSNetPL(args)
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
     checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, monitor="val_total_loss")
-
-    trainer = pl.Trainer(gpus=2,
-                         max_epochs=90,
+    trainer = pl.Trainer(gpus=args.num_gpus,
+                         max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
                          distributed_backend='ddp',

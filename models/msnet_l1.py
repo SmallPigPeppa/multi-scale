@@ -4,12 +4,6 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from torch import optim
 import torch.nn.functional as F
-try:
-    from data_modules.dali_dataloader import ClassificationDALIDataModule
-except ImportError:
-    _dali_avaliable = False
-else:
-    _dali_avaliable = True
 
 
 def unified_net():
