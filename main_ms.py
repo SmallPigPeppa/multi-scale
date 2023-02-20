@@ -117,7 +117,7 @@ if __name__ == '__main__':
     #                               num_threads=args.num_threads)
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
-        val_data_path=os.path.join(args.data_xdir,'val'),
+        val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
 
