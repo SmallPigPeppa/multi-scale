@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -113,11 +114,11 @@ if __name__ == '__main__':
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
-    dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
-                                  num_threads=args.num_threads)
+    # dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
+    #                               num_threads=args.num_threads)
     dali_datamodule = ClassificationDALIDataModule(
-        train_data_path=args.train_data_path,
-        val_data_path=args.val_data_path,
+        train_data_path=os.path.join(args.data_dir,'train'),
+        val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=4,
         batch_size=args.batch_size * args.num_gpus)
 
