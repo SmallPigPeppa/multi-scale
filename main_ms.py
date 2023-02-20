@@ -120,6 +120,7 @@ if __name__ == '__main__':
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=2,
+        precision=16,
         batch_size=args.batch_size)
 
     trainer.fit(model, datamodule=dali_datamodule)
