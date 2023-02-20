@@ -19,7 +19,6 @@ class HybridTrainPipe(Pipeline):
                                             mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                             std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
         self.coin = ops.CoinFlip(probability=0.5)
-        self.label = ops.LabelReader(sources=data_dir + '/train/labels.txt')
 
     def define_graph(self):
         jpegs, labels = self.input(name="Reader")
@@ -32,6 +31,7 @@ class HybridTrainPipe(Pipeline):
 class HybridValPipe(Pipeline):
     def __init__(self, batch_size, num_threads, device_id, data_dir):
         super().__init__(batch_size, num_threads, device_id, seed=12 + device_id)
+
         self.input = ops.FileReader(file_root=data_dir + '/val')
         self.decode = ops.ImageDecoder(device="mixed", output_type=types.RGB)
         self.resize = ops.Resize(device="gpu", resize_shorter=256)
@@ -42,7 +42,6 @@ class HybridValPipe(Pipeline):
                                             image_type=types.RGB,
                                             mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                             std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
-        self.label = ops.LabelReader(sources=data_dir + '/val/labels.txt')
 
     def define_graph(self):
         jpegs, labels = self.input(name="Reader")
