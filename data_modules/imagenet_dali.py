@@ -61,6 +61,7 @@ class DALIDataset(pl.LightningDataModule):
         self.device_id = device_id
 
     def setup(self, stage):
+        self.device_id = self.trainer.local_rank
         self.train_pipe = HybridTrainPipe(batch_size=self.batch_size,
                                            num_threads=self.num_threads,
                                            device_id=self.device_id,
