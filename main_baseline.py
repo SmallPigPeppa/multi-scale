@@ -114,4 +114,4 @@ if __name__ == '__main__':
         batch_size=args.batch_size)
 
     # trainer.validate(model, datamodule=dali_datamodule)
-    trainer.test(model, datamodule=dali_datamodule)
+    trainer.validate(model, datamodule=dali_datamodule)
