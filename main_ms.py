@@ -96,7 +96,7 @@ class MSNetPL(pl.LightningModule):
                                                      num_threads=self.num_threads,
                                                      device_id=self.local_rank)
         dali_train_loader.build()
-        return iter(dali_train_loader)
+        return iter(dali_train_loader.run())
 
     def val_dataloader(self):
 
@@ -104,7 +104,7 @@ class MSNetPL(pl.LightningModule):
                                                  num_threads=self.num_threads,
                                                  device_id=self.local_rank)
         dali_val_loader.build()
-        return iter(dali_val_loader)
+        return iter(dali_val_loader.run())
 
 
 if __name__ == '__main__':
