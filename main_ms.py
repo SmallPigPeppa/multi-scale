@@ -94,9 +94,11 @@ class MSNetPL(pl.LightningModule):
         return [optimizer], [scheduler]
 
     def train_dataloader(self):
+        self.dali_dataset.setup('train')
         return self.dali_dataset.train_dataloader()
 
     def val_dataloader(self):
+        self.dali_dataset.setup('val')
         return self.dali_dataset.val_dataloader()
 
 
