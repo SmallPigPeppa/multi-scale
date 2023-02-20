@@ -20,20 +20,27 @@ class MSNetPL(pl.LightningModule):
         self.num_gpus = args.num_gpus
         self.lr = args.lr
         self.args = args
-        self.model = MultiScaleNet()
+        self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
         self.dali_dataset = DALIDataset(data_dir=args.data_dir,
                                         batch_size=args.batch_size * self.num_gpus,
                                         num_threads=args.num_threads,
                                         num_gpus=args.num_gpus)
+        self.fc = nn.Linear(in_features=2048, out_features=args.num_classes)
 
     def forward(self, x):
-        return self.model(x)
+        z1, z2, z3, y1, y2, y3 = self.encoder(x)
+        y1=self.fc(y1)
+        y2=self.fc(y2)
+        y3=self.fc(y3)
+        return z1, z2, z3, y1, y2, y3
+
 
     def share_step(self, batch, batch_idx):
         x, target = batch
-        z1, z2, z3, y1, y2, y3 = self.multi_scale_net(x)
+        z1, z2, z3, y1, y2, y3 = self.forward(x)
+
 
         si_loss1 = self.mse_loss(z1, z2)
         si_loss2 = self.mse_loss(z1, z3)

@@ -41,6 +41,7 @@ class MultiScaleNet(nn.Module):
         self.large_size = (224, 224)
         self.unified_size = (56, 56)
 
+
     def forward(self, imgs):
         small_imgs = F.interpolate(imgs, size=self.small_size, mode='bilinear')
         mid_imgs = F.interpolate(imgs, size=self.mid_size, mode='bilinear')
@@ -56,6 +57,8 @@ class MultiScaleNet(nn.Module):
         y1 = self.unified_net(z1)
         y2 = self.unified_net(z2)
         y3 = self.unified_net(z3)
+
+
         return z1, z2, z3, y1, y2, y3
 
 
