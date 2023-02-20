@@ -117,7 +117,7 @@ if __name__ == '__main__':
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
-                         accelerator='ddp',
+                         strategy='ddp',
                          precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
