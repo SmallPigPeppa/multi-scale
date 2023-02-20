@@ -4,6 +4,8 @@ import nvidia.dali.ops as ops
 import nvidia.dali.types as types
 from nvidia.dali.plugin.pytorch import DALIGenericIterator
 
+
+
 class HybridTrainPipe(Pipeline):
     def __init__(self, batch_size, num_threads, device_id, data_dir):
         super().__init__(batch_size, num_threads, device_id, seed=12 + device_id)
@@ -51,34 +53,34 @@ class HybridValPipe(Pipeline):
         return output, labels
 
 
-class DALIDataset(pl.LightningDataModule):
-    def __init__(self, data_dir, batch_size, num_threads, num_gpus):
-        super().__init__()
-        self.data_dir = data_dir
-        self.batch_size = batch_size
-        self.num_threads = num_threads
-        self.num_gpus = num_gpus
-
-    def setup(self, stage):
-        self.train_pipes = [HybridTrainPipe(batch_size=self.batch_size,
-                                             num_threads=self.num_threads,
-                                             device_id=i,
-                                             data_dir=self.data_dir)
-                            for i in range(self.num_gpus)]
-        self.val_pipes = [HybridValPipe(batch_size=self.batch_size,
-                                         num_threads=self.num_threads,
-                                         device_id=i,
-                                         data_dir=self.data_dir)
-                          for i in range(self.num_gpus)]
-        for pipe in self.train_pipes + self.val_pipes:
-            pipe.build()
-
-    def train_dataloader(self):
-        return [DALIGenericIterator(pipe, ['data', 'label'],
-                                    self.batch_size, fill_last_batch=False)
-                for pipe in self.train_pipes]
-
-    def val_dataloader(self):
-        return [DALIGenericIterator(pipe, ['data', 'label'],
-                                    self.batch_size, fill_last_batch=False)
-                for pipe in self.val_pipes]
+# class DALIDataset(pl.LightningDataModule):
+#     def __init__(self, data_dir, batch_size, num_threads, num_gpus):
+#         super().__init__()
+#         self.data_dir = data_dir
+#         self.batch_size = batch_size
+#         self.num_threads = num_threads
+#         self.num_gpus = num_gpus
+#
+#     def setup(self, stage):
+#         self.train_pipes = [HybridTrainPipe(batch_size=self.batch_size,
+#                                              num_threads=self.num_threads,
+#                                              device_id=i,
+#                                              data_dir=self.data_dir)
+#                             for i in range(self.num_gpus)]
+#         self.val_pipes = [HybridValPipe(batch_size=self.batch_size,
+#                                          num_threads=self.num_threads,
+#                                          device_id=i,
+#                                          data_dir=self.data_dir)
+#                           for i in range(self.num_gpus)]
+#         for pipe in self.train_pipes + self.val_pipes:
+#             pipe.build()
+#
+#     def train_dataloader(self):
+#         return [DALIGenericIterator(pipe, ['data', 'label'],
+#                                     self.batch_size, fill_last_batch=False)
+#                 for pipe in self.train_pipes]
+#
+#     def val_dataloader(self):
+#         return [DALIGenericIterator(pipe, ['data', 'label'],
+#                                     self.batch_size, fill_last_batch=False)
+#                 for pipe in self.val_pipes]

@@ -5,7 +5,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
-from data_modules.imagenet_dali import DALIDataset
+from data_modules.imagenet_dali import HybridValPipe,HybridTrainPipe
 from models.msnet_l1 import MultiScaleNet
 from args import parse_args
 
@@ -18,8 +18,10 @@ class MSNetPL(pl.LightningModule):
         self.batch_size = args.batch_size
         self.num_threads = args.num_threads
         self.num_gpus = args.num_gpus
+        self.batch_size=args.batch_size
         self.lr = args.lr
         self.args = args
+
         self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
@@ -93,12 +95,18 @@ class MSNetPL(pl.LightningModule):
         return [optimizer], [scheduler]
 
     def train_dataloader(self):
-        self.dali_dataset.setup('train')
-        return self.dali_dataset.train_dataloader()
+        if self.dali_train_loader is None:
+            self.dali_train_loader = HybridTrainPipe(batch_size=self.batch_size * self.num_gpus,
+                                                     num_threads=self.num_threads,
+                                                     device_id=self.local_rank)
+        return self.dali_train_loader
 
     def val_dataloader(self):
-        self.dali_dataset.setup('val')
-        return self.dali_dataset.val_dataloader()
+        if self.dali_val_loader is None:
+            self.dali_val_loader = HybridValPipe(batch_size=self.batch_size * self.num_gpus,
+                                                     num_threads=self.num_threads,
+                                                     device_id=self.local_rank)
+        return self.dali_val_loader
 
 
 if __name__ == '__main__':
