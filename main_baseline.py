@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
-from models.msnet_l1 import MultiScaleNet
+from models.baseline_net import BaselineNet
 from data_modules.imagenet_dali import ClassificationDALIDataModule
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
@@ -19,7 +19,7 @@ class BaselineNetPL(pl.LightningModule):
         self.batch_size = args.batch_size
         self.lr = args.lr
         self.args = args
-        self.encoder = MultiScaleNet()
+        self.encoder = BaselineNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
 
