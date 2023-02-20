@@ -7,7 +7,6 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from data_modules.imagenet_dali import DALIDataset
 from models.msnet_l1 import MultiScaleNet
-from data_modules.ali import ClassificationDALIDataModule
 from args import parse_args
 
 
@@ -115,10 +114,4 @@ if __name__ == '__main__':
 
     dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
                                   num_threads=args.num_threads)
-    dali_datamodule = ClassificationDALIDataModule(
-        train_data_path=args.train_data_path,
-        val_data_path=args.val_data_path,
-        num_workers=4,
-        batch_size=args.batch_size * args.num_gpus)
-
     trainer.fit(model, datamodule=dali_datamodule)
