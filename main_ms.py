@@ -8,6 +8,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from models.msnet_l1 import MultiScaleNet
 from data_modules.imagenet_dali import ClassificationDALIDataModule
+from data_modules.not_dali import prepare_data
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
 
@@ -130,5 +131,16 @@ if __name__ == '__main__':
         val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
+
+    train_loader, val_loader = prepare_data(
+        'imagenet',
+        train_data_path=os.path.join(args.data_dir,'train'),
+        val_data_path=os.path.join(args.data_dir,'val'),
+        data_format= "image_folder",
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+    )
+
+    dali_datamodule.val_dataloader = lambda: val_loader
 
     trainer.fit(model, datamodule=dali_datamodule)
