@@ -108,8 +108,6 @@ from args import parse_args
 
 if __name__ == '__main__':
     # pl.seed_everything(5)
-    import time
-    time.sleep(60*60*60)
     args = parse_args()
     a=torch.rand([1,2,3]).cuda()
     print(a)
