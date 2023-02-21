@@ -119,6 +119,7 @@ if __name__ == '__main__':
                          check_val_every_n_epoch=5,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
+                         gradient_clip_val=0.5,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
