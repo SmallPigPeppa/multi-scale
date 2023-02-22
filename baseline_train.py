@@ -16,9 +16,6 @@ from args import parse_args
 class BaselineNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
-        self.num_gpus = args.num_gpus
-        self.batch_size = args.batch_size
-        self.lr = args.lr
         self.args = args
         self.encoder = BaselineNet()
         self.ce_loss = nn.CrossEntropyLoss()
@@ -66,15 +63,15 @@ class BaselineNetPL(pl.LightningModule):
         return val_result_dict
 
     def configure_optimizers(self):
-        scale_factor = self.batch_size * self.num_gpus  / 256
-        lr = self.lr * scale_factor
+        scale_factor = self.args.batch_size * self.args.num_gpus / 256
+        lr = self.args.lr * scale_factor
+        wd = self.args.weight_decay
         optimizer = optim.SGD(self.parameters(),
                               lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
-
 
 
 

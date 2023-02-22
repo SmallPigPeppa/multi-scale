@@ -16,9 +16,6 @@ from args import parse_args
 class MSNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
-        self.num_gpus = args.num_gpus
-        self.batch_size = args.batch_size
-        self.lr = args.lr
         self.args = args
         self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
@@ -83,22 +80,15 @@ class MSNetPL(pl.LightningModule):
         return val_result_dict
 
     def configure_optimizers(self):
-        scale_factor = self.batch_size * self.num_gpus  / 256
-        lr = self.lr * scale_factor
+        scale_factor = self.args.batch_size * self.args.num_gpus / 256
+        lr = self.args.lr * scale_factor
+        wd = self.args.weight_decay
         optimizer = optim.SGD(self.parameters(),
                               lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -108,7 +98,8 @@ if __name__ == '__main__':
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
-    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=1, monitor="train_total_loss")
+    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=1,
+                                          monitor="train_total_loss")
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
@@ -121,10 +112,12 @@ if __name__ == '__main__':
     try:
         from pytorch_lightning.loops import FitLoop
 
+
         class WorkaroundFitLoop(FitLoop):
             @property
             def prefetch_batches(self) -> int:
                 return 1
+
 
         trainer.fit_loop = WorkaroundFitLoop(
             trainer.fit_loop.min_epochs, trainer.fit_loop.max_epochs
@@ -133,10 +126,9 @@ if __name__ == '__main__':
         pass
 
     dali_datamodule = ClassificationDALIDataModule(
-        train_data_path=os.path.join(args.data_dir,'train'),
-        val_data_path=os.path.join(args.data_dir,'val'),
+        train_data_path=os.path.join(args.data_dir, 'train'),
+        val_data_path=os.path.join(args.data_dir, 'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
-
 
     trainer.fit(model, datamodule=dali_datamodule)
