@@ -35,7 +35,7 @@ class BaseWrapper(DALIGenericIterator):
             return size // (self._devices * self.batch_size)
 
 
-class Wrapper(BaseWrapper):
+class Wrapper(DALIGenericIterator):
     def __next__(self):
         batch = super().__next__()
         x, target = batch[0]["x"], batch[0]["label"]
