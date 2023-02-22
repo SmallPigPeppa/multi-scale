@@ -69,7 +69,7 @@ class BaselineNetPL(pl.LightningModule):
         optimizer = optim.SGD(self.parameters(),
                               lr=lr,
                               momentum=0.9,
-                              weight_decay=1e-4)
+                              weight_decay=wd)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
 
