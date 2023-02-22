@@ -7,7 +7,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from models.baseline_net import BaselineNet
-from data_modules.imagenet_dali import ClassificationDALIDataModule
+from data_modules.imagenet_dali2 import ClassificationDALIDataModule
 from data_modules.not_dali import prepare_data
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
@@ -65,11 +65,6 @@ class BaselineNetPL(pl.LightningModule):
         self.log_dict(val_result_dict)
         return val_result_dict
 
-        # def validation_epoch_end(self, outputs):
-        #     avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        #     avg_acc = torch.stack([x['val_acc'] for x in outputs]).mean()
-        #     tensorboard_logs = {'val_loss': avg_loss, 'val_acc': avg_acc}
-        #     return {'val_loss': avg_loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
         scale_factor = self.batch_size * self.num_gpus  / 256
@@ -78,7 +73,7 @@ class BaselineNetPL(pl.LightningModule):
                               lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
         return [optimizer], [scheduler]
 
 
@@ -100,29 +95,17 @@ if __name__ == '__main__':
     checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=1, monitor="train_total_loss")
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
-                         check_val_every_n_epoch=5,
+                         check_val_every_n_epoch=1,
                          gradient_clip_val=0.5,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
-    # dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
-    #                               num_threads=args.num_threads)
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
-    # train_loader, val_loader = prepare_data(
-    #     'imagenet',
-    #     train_data_path=os.path.join(args.data_dir, 'train'),
-    #     val_data_path=os.path.join(args.data_dir, 'val'),
-    #     data_format="image_folder",
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers,
-    # )
-    #
-    # dali_datamodule.val_dataloader = lambda: val_loader
 
     trainer.fit(model, datamodule=dali_datamodule)
