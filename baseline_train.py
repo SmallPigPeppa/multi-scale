@@ -97,7 +97,7 @@ if __name__ == '__main__':
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          strategy=DDPStrategy(find_unused_parameters=False),
-                         gradient_clip_val = 1.0,
+                         gradient_clip_val = 2.0,
                          precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
