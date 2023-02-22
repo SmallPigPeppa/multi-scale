@@ -82,12 +82,6 @@ class MSNetPL(pl.LightningModule):
         self.log_dict(val_result_dict)
         return val_result_dict
 
-        # def validation_epoch_end(self, outputs):
-        #     avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
-        #     avg_acc = torch.stack([x['val_acc'] for x in outputs]).mean()
-        #     tensorboard_logs = {'val_loss': avg_loss, 'val_acc': avg_acc}
-        #     return {'val_loss': avg_loss, 'log': tensorboard_logs}
-
     def configure_optimizers(self):
         scale_factor = self.batch_size * self.num_gpus  / 256
         lr = self.lr * scale_factor
