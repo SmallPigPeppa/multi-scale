@@ -94,7 +94,9 @@ class MSNetPL(pl.LightningModule):
             max_epochs=self.args.max_epochs,
             warmup_start_lr=0.01*lr,
             eta_min=0.01*lr,
-        ),
+        )
+        # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+
         return [optimizer], [scheduler]
 
 
