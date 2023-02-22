@@ -109,20 +109,20 @@ if __name__ == '__main__':
 
     # dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
     #                               num_threads=args.num_threads)
-    dali_datamodule = ClassificationDALIDataModule(
-        train_data_path=os.path.join(args.data_dir,'train'),
-        val_data_path=os.path.join(args.data_dir,'val'),
-        num_workers=args.num_workers,
-        batch_size=args.batch_size)
-    train_loader, val_loader = prepare_data(
-        'imagenet',
-        train_data_path=os.path.join(args.data_dir, 'train'),
-        val_data_path=os.path.join(args.data_dir, 'val'),
-        data_format="image_folder",
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-    )
-
-    dali_datamodule.val_dataloader = lambda: val_loader
+    # dali_datamodule = ClassificationDALIDataModule(
+    #     train_data_path=os.path.join(args.data_dir,'train'),
+    #     val_data_path=os.path.join(args.data_dir,'val'),
+    #     num_workers=args.num_workers,
+    #     batch_size=args.batch_size)
+    # train_loader, val_loader = prepare_data(
+    #     'imagenet',
+    #     train_data_path=os.path.join(args.data_dir, 'train'),
+    #     val_data_path=os.path.join(args.data_dir, 'val'),
+    #     data_format="image_folder",
+    #     batch_size=args.batch_size,
+    #     num_workers=args.num_workers,
+    # )
+    #
+    # dali_datamodule.val_dataloader = lambda: val_loader
 
     trainer.fit(model, datamodule=dali_datamodule)
