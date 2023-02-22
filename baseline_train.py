@@ -73,7 +73,7 @@ class BaselineNetPL(pl.LightningModule):
                               lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
 
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=1, monitor="train_total_loss")
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
-                         check_val_every_n_epoch=1,
+                         check_val_every_n_epoch=5,
                          gradient_clip_val=0.5,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
