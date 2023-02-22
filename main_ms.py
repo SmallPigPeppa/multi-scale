@@ -124,23 +124,25 @@ if __name__ == '__main__':
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
-    # dali_datamodule = DALIDataset(data_dir=args.data_dir, batch_size=args.batch_size * args.num_gpus,
-    #                               num_threads=args.num_threads)
+    try:
+        from pytorch_lightning.loops import FitLoop
+
+        class WorkaroundFitLoop(FitLoop):
+            @property
+            def prefetch_batches(self) -> int:
+                return 1
+
+        trainer.fit_loop = WorkaroundFitLoop(
+            trainer.fit_loop.min_epochs, trainer.fit_loop.max_epochs
+        )
+    except:
+        pass
+
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
-    #
-    # train_loader, val_loader = prepare_data(
-    #     'imagenet',
-    #     train_data_path=os.path.join(args.data_dir,'train'),
-    #     val_data_path=os.path.join(args.data_dir,'val'),
-    #     data_format= "image_folder",
-    #     batch_size=args.batch_size,
-    #     num_workers=args.num_workers,
-    # )
-    #
-    # dali_datamodule.val_dataloader = lambda: val_loader
+
 
     trainer.fit(model, datamodule=dali_datamodule)
