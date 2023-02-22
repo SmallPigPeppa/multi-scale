@@ -11,6 +11,7 @@ from data_modules.imagenet_dali import ClassificationDALIDataModule
 from data_modules.not_dali import prepare_data
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
+from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 
 class MSNetPL(pl.LightningModule):
@@ -87,8 +88,15 @@ class MSNetPL(pl.LightningModule):
                               lr=lr,
                               momentum=0.9,
                               weight_decay=wd)
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+        scheduler = LinearWarmupCosineAnnealingLR(
+            optimizer,
+            warmup_epochs=5,
+            max_epochs=self.args.max_epochs,
+            warmup_start_lr=0.01*lr,
+            eta_min=0.01*lr,
+        ),
         return [optimizer], [scheduler]
+
 
 
 if __name__ == '__main__':
