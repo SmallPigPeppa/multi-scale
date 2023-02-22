@@ -73,7 +73,7 @@ class BaselineNetPL(pl.LightningModule):
                               lr=lr,
                               momentum=0.9,
                               weight_decay=1e-4)
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=0.1)
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
 
 
@@ -96,12 +96,11 @@ if __name__ == '__main__':
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
-                         gradient_clip_val=0.5,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
-
+    # gradient_clip_val = 0.5,
 
     # fix for incompatibility with nvidia-dali and pytorch lightning
     # with dali 1.15 (this will be fixed on 1.16)
