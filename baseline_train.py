@@ -102,6 +102,25 @@ if __name__ == '__main__':
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
+
+    # fix for incompatibility with nvidia-dali and pytorch lightning
+    # with dali 1.15 (this will be fixed on 1.16)
+    # https://github.com/Lightning-AI/lightning/issues/12956
+    try:
+        from pytorch_lightning.loops import FitLoop
+
+        class WorkaroundFitLoop(FitLoop):
+            @property
+            def prefetch_batches(self) -> int:
+                return 1
+
+        trainer.fit_loop = WorkaroundFitLoop(
+            trainer.fit_loop.min_epochs, trainer.fit_loop.max_epochs
+        )
+    except:
+        pass
+
+
     dali_datamodule = ClassificationDALIDataModule(
         train_data_path=os.path.join(args.data_dir,'train'),
         val_data_path=os.path.join(args.data_dir,'val'),
