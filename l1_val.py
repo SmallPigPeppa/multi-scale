@@ -79,7 +79,7 @@ if __name__ == '__main__':
     pl.seed_everything(5)
     args = parse_args()
     val_ckpt_path = args.val_ckpt_path
-    model = MSNetPL.load_from_checkpoint(val_ckpt_path)
+    model = MSNetValPL(args)
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
