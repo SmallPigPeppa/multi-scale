@@ -108,7 +108,7 @@ if __name__ == '__main__':
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
-    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, monitor="val_acc3")
+    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, mode='max',monitor="val_acc3")
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
