@@ -62,9 +62,9 @@ class MSNetValPL(pl.LightningModule):
         acc3_list = []
         acc_best_list = []
         for size_i in self.size_list:
-            avg_acc1_size_i = sum([output[f"{size_i}_acc1"] for output in outputs]) / len(outputs)
-            avg_acc2_size_i = sum([output[f"{size_i}_acc2"] for output in outputs]) / len(outputs)
-            avg_acc3_size_i = sum([output[f"{size_i}_acc3"] for output in outputs]) / len(outputs)
+            avg_acc1_size_i = 100* sum([output[f"{size_i}_acc1"] for output in outputs]) / len(outputs)
+            avg_acc2_size_i = 100 * sum([output[f"{size_i}_acc2"] for output in outputs]) / len(outputs)
+            avg_acc3_size_i = 100* sum([output[f"{size_i}_acc3"] for output in outputs]) / len(outputs)
             avg_acc_best_size_i = max(avg_acc1_size_i, avg_acc2_size_i, avg_acc3_size_i)
             acc1_list.append(avg_acc1_size_i)
             acc2_list.append(avg_acc2_size_i)
