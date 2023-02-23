@@ -20,12 +20,13 @@ class MSNetValPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.ms_model = MSNetPL(args)
-        self.ms_model = self.ms_model.load_from_checkpoint(args.val_ckpt_path)
+        # self.ms_model = MSNetPL(args)
+        # self.ms_model = self.ms_model.load_from_checkpoint(args.val_ckpt_path)
+        self.encoder = MSNetPL.load_from_checkpoint(checkpoint_path=args.val_ckpt_path,args=args).encoder
         self.size_list = list(range(args.start_size, args.end_size, args.interval))
 
     def forward(self, x):
-        z1, z2, z3, y1, y2, y3 = self.ms_model.encoder(x)
+        z1, z2, z3, y1, y2, y3 = self.encoder(x)
         return z1, z2, z3, y1, y2, y3
 
     def share_step(self, x, target):
@@ -55,7 +56,7 @@ class MSNetValPL(pl.LightningModule):
         # self.log_dict(all_size_dict)
         return all_size_dict
 
-    def validation_end(self, outputs):
+    def validation_epoch_end(self, outputs):
         acc1_list = []
         acc2_list = []
         acc3_list = []
