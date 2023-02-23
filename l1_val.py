@@ -20,11 +20,12 @@ class MSNetValPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.encoder = MSNetPL.load_from_checkpoint(checkpoint_path=args.val_ckpt_path,args=args).encoder
+        self.ms_model = MSNetPL(args)
+        self.ms_model = self.ms_model.load_from_checkpoint(args.val_ckpt_path)
         self.size_list = list(range(args.start_size, args.end_size, args.interval))
 
     def forward(self, x):
-        z1, z2, z3, y1, y2, y3 = self.encoder(x)
+        z1, z2, z3, y1, y2, y3 = self.ms_model.encoder(x)
         return z1, z2, z3, y1, y2, y3
 
     def share_step(self, x, target):
