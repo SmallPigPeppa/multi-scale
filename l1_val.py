@@ -71,10 +71,10 @@ class MSNetValPL(pl.LightningModule):
             acc3_list.append(avg_acc3_size_i)
             acc_best_list.append(avg_acc_best_size_i)
 
-        self.log({"acc1": acc1_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log({"acc2": acc2_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log({"acc3": acc3_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log({"acc_best": acc_best_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(value={"acc1": acc1_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(value={"acc2": acc2_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(value={"acc3": acc3_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(value={"acc_best": acc_best_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
 
 
 if __name__ == '__main__':
