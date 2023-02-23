@@ -59,7 +59,7 @@ class MSNetValPL(pl.LightningModule):
             acc_list.append(avg_acc_size_i)
 
 
-        self.log(name='acc_best',value={"acc": torch.tensor(acc_list), "x_axis": torch.tensor(self.size_list)}, on_step=False, prog_bar=False)
+        self.log(name='acc_best',value= torch.tensor(acc_list), on_step=True, prog_bar=False)
 
 
 
