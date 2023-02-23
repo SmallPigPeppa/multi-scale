@@ -58,8 +58,8 @@ class MSNetValPL(pl.LightningModule):
             avg_acc_size_i = sum([output[f"{size_i}_acc"] for output in outputs]) / len(outputs)
             acc_list.append(avg_acc_size_i)
 
-
-        self.log(name='acc_best',value= torch.tensor(acc_list), on_step=True, prog_bar=False)
+        self.columns = [str(i) for i in self.size_list] + ['size']
+        self.acc_table = [acc_list + ['acc']]
 
 
 
@@ -105,3 +105,4 @@ if __name__ == '__main__':
         batch_size=args.batch_size)
 
     trainer.validate(model, datamodule=dali_datamodule)
+    wandb_logger.log_table(key="acc", columns=model.columns, data=model.acc_table)
