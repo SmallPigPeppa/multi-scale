@@ -71,7 +71,7 @@ class MSNetValPL(pl.LightningModule):
             acc3_list.append(avg_acc3_size_i)
             acc_best_list.append(avg_acc_best_size_i)
 
-        self.columns = [str(i) for i in self.size_list]
+        self.columns = ['size']+[str(i) for i in self.size_list]
         self.acc_table = [['acc1']+acc1_list, ['acc2']+acc2_list, ['acc3']+acc3_list, ['acc_best']+acc_best_list]
         # self.log_table(key='acc', columns=columns, data=data)
         # self.log(name='acc1', value= torch.tensor(acc1_list), on_step=False, prog_bar=False,reduce_fx=lambda x:x)
