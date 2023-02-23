@@ -265,7 +265,7 @@ class NormalPipelineBuilder:
             self.resize = ops.RandomResizedCrop(
                 device=self.device,
                 size=224,
-                random_area=(1.0, 1.0),
+                random_area=(0.08, 1.0),
                 interp_type=types.INTERP_CUBIC,
             )
             # normalize and horizontal flip

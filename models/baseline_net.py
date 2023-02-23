@@ -39,7 +39,7 @@ if __name__ == '__main__':
     # small_imgs = torch.rand(8, 3, 32, 32)
     # mid_imgs = torch.rand(8, 3, 128, 128)
     large_imgs = torch.rand(8, 3, 224, 224)
-    m_model = MultiScaleNet()
+    m_model = BaselineNet()
     out = m_model(large_imgs)
     print("end")
 
