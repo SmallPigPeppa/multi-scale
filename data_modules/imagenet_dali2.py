@@ -318,3 +318,4 @@ if __name__ == '__main__':
 
     # use normal torchvision dataloader for validation to save memory
     dali_datamodule.val_dataloader = lambda: val_loader
+
