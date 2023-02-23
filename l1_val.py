@@ -20,7 +20,7 @@ class MSNetValPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.encoder = MSNetPL.load_from_checkpoint(args.val_ckpt_path).encoder
+        self.encoder = MSNetPL(args).load_from_checkpoint(args.val_ckpt_path).encoder
         self.size_list = list(range(args.start_size, args.end_size, args.interval))
 
     def forward(self, x):
