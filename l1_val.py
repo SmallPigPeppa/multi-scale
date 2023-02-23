@@ -71,10 +71,10 @@ class MSNetValPL(pl.LightningModule):
             acc3_list.append(avg_acc3_size_i)
             acc_best_list.append(avg_acc_best_size_i)
 
-        self.log(name='acc1', value={"acc": torch.tensor(acc1_list), "x_axis": torch.tensor(self.size_list)}, on_step=False, prog_bar=False)
-        self.log(name='acc2', value={"acc": torch.tensor(acc2_list), "x_axis": torch.tensor(self.size_list)}, on_step=False, prog_bar=False)
-        self.log(name='acc3', value={"acc": torch.tensor(acc3_list), "x_axis": torch.tensor(self.size_list)}, on_step=False, prog_bar=False)
-        self.log(name='acc_best', value={"acc": torch.tensor(acc_best_list), "x_axis": torch.tensor(self.size_list)}, on_step=False, prog_bar=False)
+        self.log(name='acc1', value= torch.tensor(acc1_list), on_step=True, prog_bar=False)
+        self.log(name='acc2', value= torch.tensor(acc2_list), on_step=True, prog_bar=False)
+        self.log(name='acc3', value= torch.tensor(acc3_list), on_step=True, prog_bar=False)
+        self.log(name='acc_best', value= torch.tensor(acc_best_list), on_step=True, prog_bar=False)
 
 
 if __name__ == '__main__':
