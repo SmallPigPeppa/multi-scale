@@ -35,7 +35,7 @@ class MSNetValPL(pl.LightningModule):
         acc = (torch.argmax(y, dim=1) == target).float().mean()
 
         result_dict = {
-            'acc':acc
+            'acc': acc
         }
         return result_dict
 
@@ -55,13 +55,11 @@ class MSNetValPL(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         acc_list = []
         for size_i in self.size_list:
-            avg_acc_size_i = sum([output[f"{size_i}_acc"] for output in outputs]) / len(outputs)
+            avg_acc_size_i = 100 * sum([output[f"{size_i}_acc"] for output in outputs]) / len(outputs)
             acc_list.append(avg_acc_size_i)
 
         self.columns = [str(i) for i in self.size_list] + ['size']
         self.acc_table = [acc_list + ['acc']]
-
-
 
 
 if __name__ == '__main__':
