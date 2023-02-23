@@ -14,6 +14,12 @@ def parse_args():
     parser.add_argument("--num_workers", type=int, default=2)
     parser.add_argument("--max_epochs", type=int, default=105)
 
+
+    parser.add_argument("--val_ckpt_path",type=str,default='./supervised-l1-ckpt/last.ckpt')
+    parser.add_argument("--start_size",type=int,default=32)
+    parser.add_argument("--end_size",type=int,default=225)
+    parser.add_argument("--interval",type=int,default=16)
+
     # wandb
     parser.add_argument("--name", type=str, default='multi-scale-net-l1')
     parser.add_argument("--project", type=str, default='Multi-Scale-Net')
