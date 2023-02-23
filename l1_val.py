@@ -22,7 +22,7 @@ class MSNetValPL(pl.LightningModule):
         self.args = args
         # self.ms_model = MSNetPL(args)
         # self.ms_model = self.ms_model.load_from_checkpoint(args.val_ckpt_path)
-        self.encoder = MSNetPL.load_from_checkpoint(checkpoint_path=args.val_ckpt_path,args=args).encoder
+        self.encoder = MSNetPL.load_from_checkpoint(checkpoint_path=args.val_ckpt_path, args=args).encoder
         self.size_list = list(range(args.start_size, args.end_size, args.interval))
 
     def forward(self, x):
@@ -71,10 +71,10 @@ class MSNetValPL(pl.LightningModule):
             acc3_list.append(avg_acc3_size_i)
             acc_best_list.append(avg_acc_best_size_i)
 
-        self.log(value={"acc1": acc1_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log(value={"acc2": acc2_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log(value={"acc3": acc3_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
-        self.log(value={"acc_best": acc_best_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(name='acc1', value={"acc": acc1_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(name='acc2', value={"acc": acc2_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(name='acc3', value={"acc": acc3_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
+        self.log(name='acc_best', value={"acc": acc_best_list, "x_axis": self.size_list}, on_step=False, prog_bar=False)
 
 
 if __name__ == '__main__':
