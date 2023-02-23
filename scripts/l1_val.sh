@@ -7,4 +7,5 @@ DATA_PATH=/mnt/mmtech01/dataset/lzy/ILSVRC2012
     --batch_size 128 \
     --ckpt_dir supervised-l1-ckpt \
     --name supervised-l1 \
-    --project Multi-Scale-Net-val
+    --project Multi-Scale-Net-val \
+    --val_ckpt_path supervised-l1-ckpt/last.ckpt
