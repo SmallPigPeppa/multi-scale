@@ -122,5 +122,5 @@ if __name__ == '__main__':
         num_workers=args.num_workers,
         batch_size=args.batch_size)
 
-    trainer.validate(model, datamodule=dali_datamodule)
+    trainer.validate(model, dataloaders=dali_datamodule.val_dataloader())
     wandb_logger.log_table(key="acc", columns=model.columns, data=model.acc_table)
