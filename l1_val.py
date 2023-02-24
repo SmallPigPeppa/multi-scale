@@ -57,6 +57,7 @@ class MSNetValPL(pl.LightningModule):
         return all_size_dict
 
     def validation_epoch_end(self, outputs):
+        print(outputs)
         acc1_list = []
         acc2_list = []
         acc3_list = []
@@ -90,8 +91,7 @@ if __name__ == '__main__':
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
     checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, monitor="val_acc3")
-    trainer = pl.Trainer(log_every_n_steps=1,
-                         gpus=args.num_gpus,
+    trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          strategy=DDPStrategy(find_unused_parameters=False),
