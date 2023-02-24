@@ -10,7 +10,7 @@ cd /mnt/mmtech01/usr/liuwenzhuo/code/multi-scale
 DATA_PATH=/mnt/mmtech01/dataset/lzy/ILSVRC2012
 /root/miniconda3/envs/solo-learn-A100/bin/python baseline_val.py \
     --data_dir ${DATA_PATH} \
-    --num_gpus 4 \
+    --num_gpus 1 \
     --num_workers 8 \
     --batch_size 128 \
     --ckpt_dir supervised-baseline-ckpt \
