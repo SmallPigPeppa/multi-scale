@@ -16,4 +16,4 @@ DATA_PATH=/mnt/mmtech01/dataset/lzy/ILSVRC2012
     --ckpt_dir supervised-baseline-ckpt \
     --name supervised-baseline \
     --project Multi-Scale-Net-val \
-    --val_ckpt_path supervised-baseline-ckpt/last.ckpt
+    --val_ckpt_path supervised-ckpt/supervised-baseline.ckpt
