@@ -49,11 +49,11 @@ class MSNetValPL(pl.LightningModule):
         for size_i in self.size_list:
             x_size_i = F.interpolate(x, size=int(size_i), mode='bilinear')
             dict_i = self.share_step(x_size_i, target)
-            dict_size_i = {f'{str(size_i)}_{k}': v for k, v in dict_i.items()}
+            dict_size_i = {f'{size_i}_{k}': v for k, v in dict_i.items()}
             dict_list.append(dict_size_i)
 
         all_size_dict = {k: v for d in dict_list for k, v in d.items()}
-        # self.log_dict(all_size_dict)
+        self.log_dict(dict_list[-1],on_step=True)
         return all_size_dict
 
     def validation_epoch_end(self, outputs):
