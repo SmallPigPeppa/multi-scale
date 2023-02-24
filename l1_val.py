@@ -53,7 +53,7 @@ class MSNetValPL(pl.LightningModule):
             dict_list.append(dict_size_i)
 
         all_size_dict = {k: v for d in dict_list for k, v in d.items()}
-        self.log_dict(dict_list[-1],on_step=True)
+        self.log_dict(dict_list[-1], on_step=True)
         return all_size_dict
 
     def validation_epoch_end(self, outputs):
@@ -62,17 +62,18 @@ class MSNetValPL(pl.LightningModule):
         acc3_list = []
         acc_best_list = []
         for size_i in self.size_list:
-            avg_acc1_size_i = 100* sum([output[f"{size_i}_acc1"] for output in outputs]) / len(outputs)
+            avg_acc1_size_i = 100 * sum([output[f"{size_i}_acc1"] for output in outputs]) / len(outputs)
             avg_acc2_size_i = 100 * sum([output[f"{size_i}_acc2"] for output in outputs]) / len(outputs)
-            avg_acc3_size_i = 100* sum([output[f"{size_i}_acc3"] for output in outputs]) / len(outputs)
+            avg_acc3_size_i = 100 * sum([output[f"{size_i}_acc3"] for output in outputs]) / len(outputs)
             avg_acc_best_size_i = max(avg_acc1_size_i, avg_acc2_size_i, avg_acc3_size_i)
             acc1_list.append(avg_acc1_size_i)
             acc2_list.append(avg_acc2_size_i)
             acc3_list.append(avg_acc3_size_i)
             acc_best_list.append(avg_acc_best_size_i)
 
-        self.columns = [str(i) for i in self.size_list]+['size']
-        self.acc_table = [acc1_list+['acc1'], acc2_list+['acc2'], acc3_list+['acc3'], acc_best_list+['acc_best']]
+        self.columns = [str(i) for i in self.size_list] + ['size']
+        self.acc_table = [acc1_list + ['acc1'], acc2_list + ['acc2'], acc3_list + ['acc3'],
+                          acc_best_list + ['acc_best']]
         # self.log_table(key='acc', columns=columns, data=data)
         # self.log(name='acc1', value= torch.tensor(acc1_list), on_step=False, prog_bar=False,reduce_fx=lambda x:x)
         # self.log(name='acc2', value= torch.tensor(acc2_list), on_step=False, prog_bar=False)
@@ -89,7 +90,8 @@ if __name__ == '__main__':
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
     checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, monitor="val_acc3")
-    trainer = pl.Trainer(gpus=args.num_gpus,
+    trainer = pl.Trainer(log_every_n_steps=1,
+                         gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
                          strategy=DDPStrategy(find_unused_parameters=False),
