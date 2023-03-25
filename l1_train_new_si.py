@@ -6,33 +6,61 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
-from models.baseline_net import BaselineNet
-from data_modules.imagenet_dali2 import ClassificationDALIDataModule
+from models.msnet_l1 import MultiScaleNet
+from data_modules.imagenet_dali import ClassificationDALIDataModule
 from data_modules.not_dali import prepare_data
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 
-class BaselineNetPL(pl.LightningModule):
+class MSNetPL(pl.LightningModule):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.encoder = BaselineNet()
+        self.encoder = MultiScaleNet()
         self.ce_loss = nn.CrossEntropyLoss()
         self.mse_loss = nn.MSELoss()
 
     def forward(self, x):
-        y1, y2, y3 = self.encoder(x)
-        return y1, y2, y3
+        z1, z2, z3, y1, y2, y3 = self.encoder(x)
+        return z1, z2, z3, y1, y2, y3
 
     def share_step(self, batch, batch_idx):
         x, target = batch
-        y1, y2, y3 = self.forward(x)
+        z1, z2, z3, y1, y2, y3 = self.forward(x)
+
+        si_loss1 = self.mse_loss(z1, z2)
+        si_loss2 = self.mse_loss(z1, z3)
+        si_loss3 = self.mse_loss(z2, z3)
+        if si_loss1 < 0.01:
+            si_loss1 = 0
+
+        if si_loss2 < 0.01:
+            si_loss2 = 0
+
+        if si_loss3 < 0.01:
+            si_loss3 = 0
         ce_loss1 = self.ce_loss(y1, target)
         ce_loss2 = self.ce_loss(y2, target)
         ce_loss3 = self.ce_loss(y3, target)
-        total_loss = ce_loss3
+
+
+        si_loss4 = self.mse_loss(z1, z2)
+        si_loss5 = self.mse_loss(z1, z3)
+        si_loss6 = self.mse_loss(z2, z3)
+        if si_loss4 < 0.01:
+            si_loss4 = 0
+
+        if si_loss5 < 0.01:
+            si_loss5 = 0
+
+        if si_loss6 < 0.01:
+            si_loss6 = 0
+
+
+
+        total_loss = si_loss1 + si_loss2 + si_loss3 + ce_loss1 + ce_loss2 + ce_loss3
 
         acc1 = (torch.argmax(y1, dim=1) == target).float().mean()
         acc2 = (torch.argmax(y2, dim=1) == target).float().mean()
@@ -40,6 +68,9 @@ class BaselineNetPL(pl.LightningModule):
         avg_acc = (acc1 + acc2 + acc3) / 3
 
         result_dict = {
+            "si_loss1": si_loss1,
+            "si_loss2": si_loss2,
+            "si_loss3": si_loss3,
             "ce_loss1": ce_loss1,
             "ce_loss2": ce_loss2,
             "ce_loss3": ce_loss3,
@@ -75,53 +106,41 @@ class BaselineNetPL(pl.LightningModule):
             optimizer,
             warmup_epochs=5,
             max_epochs=self.args.max_epochs,
-            warmup_start_lr=0.01*lr,
-            eta_min=0.01*lr,
+            warmup_start_lr=0.01 * lr,
+            eta_min=0.01 * lr,
         )
         # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+
         return [optimizer], [scheduler]
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
     pl.seed_everything(5)
     args = parse_args()
-    model = BaselineNetPL(args)
+    model = MSNetPL(args)
     wandb_logger = WandbLogger(name=args.name, project=args.project, entity=args.entity, offline=args.offline)
     wandb_logger.watch(model, log="gradients", log_freq=100)
     wandb_logger.log_hyperparams(args)
-    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, mode='max',monitor="val_acc3")
-    # trainer = pl.Trainer(gpus=args.num_gpus,
-    #                      max_epochs=args.max_epochs,
-    #                      check_val_every_n_epoch=5,
-    #                      gradient_clip_val=0.5,
-    #                      strategy=DDPStrategy(find_unused_parameters=False),
-    #                      precision=16,
-    #                      logger=wandb_logger,
-    #                      callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
-
+    checkpoint_callback = ModelCheckpoint(dirpath=args.ckpt_dir, save_last=True, save_top_k=2, mode='max',
+                                          monitor="val_acc3")
     trainer = pl.Trainer(gpus=args.num_gpus,
                          max_epochs=args.max_epochs,
                          check_val_every_n_epoch=5,
-                         gradient_clip_val=None,
                          strategy=DDPStrategy(find_unused_parameters=False),
                          precision=16,
+                         gradient_clip_val=0.5,
                          logger=wandb_logger,
                          callbacks=[LearningRateMonitor(logging_interval="step"), checkpoint_callback])
 
     try:
         from pytorch_lightning.loops import FitLoop
 
+
         class WorkaroundFitLoop(FitLoop):
             @property
             def prefetch_batches(self) -> int:
                 return 1
+
 
         trainer.fit_loop = WorkaroundFitLoop(
             trainer.fit_loop.min_epochs, trainer.fit_loop.max_epochs
@@ -130,8 +149,8 @@ if __name__ == '__main__':
         pass
 
     dali_datamodule = ClassificationDALIDataModule(
-        train_data_path=os.path.join(args.data_dir,'train'),
-        val_data_path=os.path.join(args.data_dir,'val'),
+        train_data_path=os.path.join(args.data_dir, 'train'),
+        val_data_path=os.path.join(args.data_dir, 'val'),
         num_workers=args.num_workers,
         batch_size=args.batch_size)
 
