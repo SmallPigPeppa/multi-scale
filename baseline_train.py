@@ -64,8 +64,9 @@ class BaselineNetPL(pl.LightningModule):
         return val_result_dict
 
     def configure_optimizers(self):
-        scale_factor = self.args.batch_size * self.args.num_gpus / 256
-        lr = self.args.lr * scale_factor
+        # scale_factor = self.args.batch_size * self.args.num_gpus / 256
+        # lr = self.args.lr * scale_factor
+        lr = self.args.lr
         wd = self.args.weight_decay
         optimizer = optim.SGD(self.parameters(),
                               lr=lr,

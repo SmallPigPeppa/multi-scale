@@ -8,7 +8,7 @@ def parse_args():
     parser.add_argument("--data_dir", type=str, default='./torch_ds', required=True)
     parser.add_argument("--ckpt_dir", type=str, default='./supervised_ckpt')
     parser.add_argument("--batch_size", type=int, default=128)
-    parser.add_argument("--lr", type=float, default=0.1)
+    parser.add_argument("--lr", type=float, default=0.15)
     parser.add_argument("--weight_decay", type=float, default=0.00002)
     parser.add_argument("--num_gpus", type=int, default=2)
     parser.add_argument("--num_workers", type=int, default=2)
