@@ -7,7 +7,7 @@ from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import LearningRateMonitor
 from pytorch_lightning.callbacks import ModelCheckpoint
 from models.baseline_net import BaselineNet
-from data_modules.imagenet_dali2 import ClassificationDALIDataModule
+from data_modules.imagenet_dali import ClassificationDALIDataModule
 from data_modules.not_dali import prepare_data
 from pytorch_lightning.strategies.ddp import DDPStrategy
 from args import parse_args
@@ -72,14 +72,14 @@ class BaselineNetPL(pl.LightningModule):
                               lr=lr,
                               momentum=0.9,
                               weight_decay=wd)
-        # scheduler = LinearWarmupCosineAnnealingLR(
-        #     optimizer,
-        #     warmup_epochs=5,
-        #     max_epochs=self.args.max_epochs,
-        #     warmup_start_lr=0.01*lr,
-        #     eta_min=0.01*lr,
-        # )
-        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+        scheduler = LinearWarmupCosineAnnealingLR(
+            optimizer,
+            warmup_epochs=5,
+            max_epochs=self.args.max_epochs,
+            warmup_start_lr=0.01*lr,
+            eta_min=0.01*lr,
+        )
+        # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         return [optimizer], [scheduler]
 
 
