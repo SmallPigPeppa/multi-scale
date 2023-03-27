@@ -281,7 +281,7 @@ class NormalPipelineBuilder:
                 size=224,
                 random_area=(0.08, 1.0),
                 interp_type=types.INTERP_LINEAR,
-                ratio=(0.75, 1.3333333333333333),
+                random_aspect_ratio=(0.75, 1.3333333333333333),
             )
 
             # normalize and horizontal flip
