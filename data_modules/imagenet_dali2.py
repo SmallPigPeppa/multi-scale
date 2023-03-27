@@ -247,10 +247,17 @@ class NormalPipelineBuilder:
 
         # crop operations
         if self.validation:
-            self.resize = ops.Resize(
+            # self.resize = ops.Resize(
+            #     device=self.device,
+            #     resize_shorter=256,
+            #     interp_type=types.INTERP_CUBIC,
+            # )
+            self.antialias_resize = ops.Resize(
                 device=self.device,
-                resize_shorter=256,
-                interp_type=types.INTERP_CUBIC,
+                resize_x=256,
+                resize_y=256,
+                interp_type=types.INTERP_LINEAR,
+                antialias=True,
             )
             # center crop and normalize
             self.cmn = ops.CropMirrorNormalize(
@@ -259,22 +266,31 @@ class NormalPipelineBuilder:
                 output_layout=types.NCHW,
                 crop=(224, 224),
                 mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                std=[0.228 * 255, 0.224 * 255, 0.225 * 255],
+                std=[0.229 * 255, 0.224 * 255, 0.225 * 255],
             )
         else:
+            # self.resize = ops.RandomResizedCrop(
+            #     device=self.device,
+            #     size=224,
+            #     random_area=(0.08, 1.0),
+            #     interp_type=types.INTERP_CUBIC,
+            # )
             self.resize = ops.RandomResizedCrop(
                 device=self.device,
+                antialias=True,
                 size=224,
                 random_area=(0.08, 1.0),
-                interp_type=types.INTERP_CUBIC,
+                interp_type=types.INTERP_LINEAR,
+                ratio=(0.75, 1.3333333333333333),
             )
+
             # normalize and horizontal flip
             self.cmn = ops.CropMirrorNormalize(
                 device=self.device,
                 dtype=types.FLOAT,
                 output_layout=types.NCHW,
                 mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                std=[0.228 * 255, 0.224 * 255, 0.225 * 255],
+                std=[0.229 * 255, 0.224 * 255, 0.225 * 255],
             )
 
         self.coin05 = ops.random.CoinFlip(probability=0.5)
