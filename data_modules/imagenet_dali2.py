@@ -252,7 +252,7 @@ class NormalPipelineBuilder:
             #     resize_shorter=256,
             #     interp_type=types.INTERP_CUBIC,
             # )
-            self.antialias_resize = ops.Resize(
+            self.resize = ops.Resize(
                 device=self.device,
                 resize_x=256,
                 resize_y=256,
