@@ -90,6 +90,7 @@ class BaselineNetPL(pl.LightningModule):
 
 
 
+
 if __name__ == '__main__':
     pl.seed_everything(5)
     args = parse_args()
